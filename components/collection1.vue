@@ -4,77 +4,140 @@
       <div class="category">
         <div class="header">
           <div class="icons">
-            <i class="ri-arrow-left-s-line"></i>
-            <i class="ri-arrow-right-s-line"></i>
+            <i class="ri-arrow-left-s-line prev1"></i>
+            <i class="ri-arrow-right-s-line next1"></i>
           </div>
           <div class="text">الاحداث المضافة حديثاً</div>
         </div>
-        <Swiper class="category-cards" :modules="[Navigation, Autoplay]"
-          :slides-per-view="4"
-          :loop="true"
-          
-          :autoplay="{
-            delay: 2000,
-          }"
-          :navigation="{
-            nextEl: '.prev',
-            prevEl: '.next',
-          }"
-      
-          :space-between="20">
-          <SwiperSlide class="card">
-            <div class="card-img">
-              <div class="date">
-                <p class="number">12</p>
-                <p class="text">OTC</p>
+        <div class="category-cards swiper-container1" style="overflow: hidden;">
+          <div class="swiper-wrapper">
+            <div v-for="(event, index) in events" :key="index" class="card swiper-slide">
+              <div class="card-img">
+                <div class="date">
+                  <p class="number">{{ event.date.day }}</p>
+                  <p class="text">{{ event.date.month }}</p>
+                </div>
+                <i class="ri-calendar-2-line"></i>
               </div>
-              <i class="ri-calendar-2-line"></i>
-            </div>
-            <div class="card-text">
-              <div class="card-date">
-                <p>Lorem ipsum dolor sit amet consectetur.</p>
-                <div class="date">
-                  <p>12-اكتوبر 2025</p>
-                  <i class="ri-calendar-2-line"></i>
+              <div class="card-text">
+                <div class="card-date">
+                  <p>{{ event.title }}</p>
+                  <div class="date">
+                    <p>{{ event.date.full }}</p>
+                    <i class="ri-calendar-2-line"></i>
+                  </div>
+                  <div class="date">
+                    <p>{{ event.time }}</p>
+                    <i class="ri-calendar-2-line"></i>
+                  </div>
+                  <div class="date">
+                    <p>{{ event.organizer }}</p>
+                    <i class="ri-calendar-2-line"></i>
+                  </div>
                 </div>
-                <div class="date">
-                  <p>05 : 00 PM</p>
-                  <i class="ri-calendar-2-line"></i>
-                </div>
-                <div class="date">
-                  <p>ينضم بوساطة ABC Group</p>
-                  <i class="ri-calendar-2-line"></i>
-                </div>
-              </div>
-              <div class="card-price">
-                <button><span>حجز تذكرة</span></button>
-                <div class="price">
-                  <p>يبدء سعر حجز التذاكر</p>
-                  <div class="iq">
-                    20,000 د.ع
+                <div class="card-price">
+                  <button><span>حجز تذكرة</span></button>
+                  <div class="price">
+                    <p>يبدء سعر حجز التذاكر</p>
+                    <div class="iq">{{ event.price }} د.ع</div>
                   </div>
                 </div>
               </div>
             </div>
-          </SwiperSlide>
-        </Swiper>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
 <script setup>
-  import { Navigation, Autoplay } from "swiper/modules";
+import { onMounted, ref } from 'vue';
+import Swiper from 'swiper';
+import { Navigation } from "swiper/modules";
+import 'swiper/swiper-bundle.css';
+
+// Swiper setup
+Swiper.use([Navigation]);
+
+
+const events = ref([
+  {
+    date: { day: 12, month: 'OTC', full: '12-اكتوبر 2025' },
+    title: 'Lorem ipsum dolor sit amet consectetur.',
+    time: '05 : 00 PM',
+    organizer: 'ينضم بوساطة ABC Group',
+    price: '20,000'
+  },
+  // Add more event objects here
+  {
+    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
+    title: 'Event Title Example',
+    time: '06 : 00 PM',
+    organizer: 'ينضم بوساطة XYZ Group',
+    price: '30,000'
+  },
+  {
+    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
+    title: 'Event Title Example',
+    time: '06 : 00 PM',
+    organizer: 'ينضم بوساطة XYZ Group',
+    price: '30,000'
+  },
+  {
+    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
+    title: 'Event Title Example',
+    time: '06 : 00 PM',
+    organizer: 'ينضم بوساطة XYZ Group',
+    price: '30,000'
+  },
+  {
+    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
+    title: 'Event Title Example',
+    time: '06 : 00 PM',
+    organizer: 'ينضم بوساطة XYZ Group',
+    price: '30,000'
+  },
+  {
+    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
+    title: 'Event Title Example',
+    time: '06 : 00 PM',
+    organizer: 'ينضم بوساطة XYZ Group',
+    price: '30,000'
+  }
+]);
+
+onMounted(() => {
+  let swiper;
+
+  function initSwiper() {
+    swiper = new Swiper('.swiper-container1', {
+      navigation: {
+        nextEl: '.next1',
+        prevEl: '.prev1',
+      },
+      slidesPerView: 'auto',
+      spaceBetween: 5,
+      loop: true,
+      centeredSlides: false,
+      fade: true,
+    });
+  }
+
+  initSwiper();
+});
 </script>
 
 <style>
+
 .section-category {
-  height: 100vh;
   width: 100%;
+  overflow: hidden;
   background-color: #fff;
 }
 
 .container {
-  padding: 144px 64px;
+  padding: 30px 64px;
 }
 
 .category {
@@ -114,7 +177,8 @@ gap: 8px;
 border-radius: 100px;
 border: 1px;
 background: rgba(0, 0, 0, 0.1);
-border: 1px solid rgba(0, 0, 0, 0.15)
+border: 1px solid rgba(0, 0, 0, 0.15);
+cursor: pointer;
 }
 
 .category-cards{
@@ -280,5 +344,11 @@ font-size: 12px;
 font-weight: 400;
 line-height: 14.63px;
 color: rgba(34, 129, 217, 1);
+}
+
+.swiper-wrapper{
+  transition-duration: 0ms;
+  transform: none; 
+  transition-delay: 0ms;
 }
 </style>

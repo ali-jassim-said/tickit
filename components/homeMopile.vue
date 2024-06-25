@@ -13,15 +13,6 @@
       </div>
     </nav>
     <div class="collections">
-      <div class="collections-head">
-        <div class="collections-icon">
-          <i class="ri-arrow-left-s-line next"></i>
-          <i class="ri-arrow-right-s-line prev"></i>
-        </div>
-        <div class="collections-text">
-          <p>الاحداث الاكثر حجزا</p>
-        </div>
-      </div>
       <div class="collections-cards">
         <div class="card-text">
           <h2>{{ activeSlideText }}</h2>
@@ -32,37 +23,19 @@
             morbi lectus. Malesuada vivamus nec pharetra interdum molestie.
           </p>
         </div>
-        <Swiper
-          class="cards"
-          :modules="[Navigation, Autoplay]"
-          :slides-per-view="3"
-          :loop="true"
-          
-          :autoplay="{
-            delay: 2000,
-          }"
-          :navigation="{
-            nextEl: '.prev',
-            prevEl: '.next',
-          }"
-      
-          :space-between="20"
-        >
-          <SwiperSlide
-            class="card"
-            v-for="(slide, index) in slides"
-            :key="index"
-            @click="updateActiveSlide(slide)"
-            :class="{ active: isActiveSlide(index) }"
-          >
-            <div class="img">
+        <div class="swiper-containerM" style="overflow: hidden">
+          <div class="swiper-wrapper cards">
+            <div
+              class="swiper-slide card"
+              v-for="(slide, index) in slides"
+              :key="index"
+              @click="updateActiveSlide(slide)"
+              :class="{ active: isActiveSlide(index) }"
+            >
               <img :src="slide.image" alt="" />
             </div>
-            <div class="text">
-              <h2 :class="{ activeText: isActiveSlide(index) }">{{ slide.text }}</h2>
-            </div>
-          </SwiperSlide>
-        </Swiper>
+          </div>
+        </div>
       </div>
     </div>
     <div class="scroll">
@@ -73,7 +46,9 @@
 </template>
 
 <script setup>
-import { Navigation, Autoplay } from "swiper/modules";
+import { ref, onMounted } from "vue";
+import Swiper from "swiper";
+import "swiper/swiper-bundle.css";
 
 const slides = ref([
   {
@@ -92,8 +67,15 @@ const slides = ref([
     image: "/img/home.png",
     text: "Lorem ipsum dolor sit amet consectetur 4.",
   },
+  {
+    image: "/img/home.png",
+    text: "Lorem ipsum dolor sit amet consectetur 4.",
+  },
+  {
+    image: "/img/home.png",
+    text: "Lorem ipsum dolor sit amet consectetur 4.",
+  },
 ]);
-
 
 const activeSlideText = ref(slides.value[0].text);
 const activeSlideImage = ref(slides.value[0].image);
@@ -108,40 +90,28 @@ function updateActiveSlide(slide) {
 function isActiveSlide(index) {
   return index === activeIndex.value;
 }
-</script>
 
-<style>
-@import url("remixicon/fonts/remixicon.css");
-
-/*
-import { onMounted, ref } from "vue";
-import { useCategoriesStore } from "@/stores/categories";
-
-
-
-
-const categoriesStore = useCategoriesStore();
-const categories = ref([]);
-const error = ref(null);
-
-
-
-const fetchCategories = async () => {
-  await categoriesStore.fetchCategories();
-  categories.value = categoriesStore.categories;
-  error.value = categoriesStore.error;
-};
-
-onMounted(async () => {
-  await fetchCategories();
+onMounted(() => {
+  new Swiper(".swiper-containerM", {
+    slidesPerView: "auto",
+    spaceBetween: 5,
+    centeredSlides: false,
+    loop: true,
+    fadeEffect: { crossFade: true },
+    effect: 'fade',
+  });
 });
-*/
+</script>
+<style scoped>
 
-.active{
+.active {
+  border: 5px solid #fff !important;
+  border-radius: 50% !important;
   background-color: #fff !important;
+  overflow: hidden;
 }
 
-.activeText{
+.activeText {
   color: black !important;
 }
 
@@ -195,9 +165,9 @@ onMounted(async () => {
 }
 
 .nav-login {
-  width: 73px;
+  width: 90px;
   height: 24px;
-  padding: 6px 12px 6px 12px;
+  padding: 10px 20px 10px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -208,7 +178,7 @@ onMounted(async () => {
 }
 
 .nav-login button {
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 14.4px;
   color: rgba(255, 255, 255, 1);
@@ -220,7 +190,7 @@ onMounted(async () => {
 
 .collections {
   width: 90%;
-  height: 258px;
+  height: 300px;
   margin: auto;
   display: flex;
   align-items: flex-end;
@@ -230,38 +200,6 @@ onMounted(async () => {
   bottom: 130px;
   right: 5%;
   left: 5%;
-}
-
-.collections-head {
-  width: 567px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.collections-icon {
-  width: 60px;
-  height: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-
-.collections-icon i {
-  width: 24px;
-  height: 24px;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  border-radius: 100px;
-  border: 1px;
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  cursor: pointer;
 }
 
 .collections .collections-text {
@@ -274,30 +212,32 @@ onMounted(async () => {
 
 .collections-cards {
   width: 100%;
-  height: 216px;
+  height: 100%;
   display: flex;
-  align-items: center;
+  flex-direction: column-reverse;
+  align-items: end;
   justify-content: center;
   gap: 18px;
 }
 
+.swiper-container {
+  overflow: hidden;
+}
+
 .collections-cards .card-text {
-  height: 191px;
   justify-content: space-between;
-  border-right: 2px solid rgba(255, 255, 255, 1);
-  padding-right: 15px;
 }
 
 .collections-cards .card-text h2 {
-  font-size: 48px;
+  font-size: 32px;
   font-weight: 400;
-  line-height: 48px;
+  line-height: 38px;
   text-align: right;
   color: rgba(255, 255, 255, 1);
 }
 
 .collections-cards .card-text p {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 20px;
   text-align: right;
@@ -305,33 +245,26 @@ onMounted(async () => {
 }
 
 .collections-cards .cards {
-  height: 216px;
+  width: 140px;
+  height: 85px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
 }
 
 .collections-cards .cards .card {
-  width: 177px !important;
-  height: 216px;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 9px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  cursor: pointer;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
 }
 
-.collections-cards .cards .card .img img {
-  width: 159px;
-  height: 149px;
-  border-radius: 8px;
+.collections-cards .cards .card img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
 }
 
 .collections-cards .cards .card .text h2 {
