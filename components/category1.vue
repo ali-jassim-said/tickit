@@ -4,8 +4,8 @@
       <div class="category">
         <div class="header">
           <div class="icons">
-            <i class="ri-arrow-left-s-line prev4"></i>
-            <i class="ri-arrow-right-s-line next4"></i>
+            <i class="ri-arrow-right-s-line prev4"></i>
+            <i class="ri-arrow-left-s-line next4"></i>
           </div>
           <div class="text">أكتشف جميع الاحداث</div>
         </div>
@@ -88,7 +88,10 @@ onMounted(() => {
 
 <style>
 
+
+
 .section-category {
+  direction: rtl;
   width: 100%;
   overflow: hidden;
   background-color: #fff;

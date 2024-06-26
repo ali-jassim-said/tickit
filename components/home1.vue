@@ -30,7 +30,7 @@
           </p>
         </div>
         
-          <div class="  swiper-container" style="overflow: hidden;">
+          <div class="  swiper-container" style="overflow: hidden;  direction: rtl;">
             <div class="cards swiper-wrapper">
             <div
               class="swiper-slide card"
