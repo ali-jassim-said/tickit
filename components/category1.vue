@@ -11,11 +11,11 @@
         </div>
         <div class="category-cards swiper-container4" style="overflow: hidden;">
           <div class="swiper-wrapper">
-            <div v-for="(event, index) in events" :key="index" class="card swiper-slide">
+            <div v-for="(event, index) in eventsStore.events" :key="index" class="card swiper-slide">
               <div class="card-img">
                 <div class="date">
-                  <p class="number">{{ event.date.day }}</p>
-                  <p class="text">{{ event.date.month }}</p>
+                  <p class="number">{{ new Date(event.startDate).getDate() }}</p>
+                  <p class="text">{{ new Date(event.startDate).toLocaleString('default', { month: 'short' }) }}</p>
                 </div>
                 <i class="ri-calendar-2-line"></i>
               </div>
@@ -23,15 +23,15 @@
                 <div class="card-date">
                   <p>{{ event.title }}</p>
                   <div class="date">
-                    <p>{{ event.date.full }}</p>
+                    <p>{{ new Date(event.startDate).toLocaleDateString() }}</p>
                     <i class="ri-calendar-2-line"></i>
                   </div>
                   <div class="date">
-                    <p>{{ event.time }}</p>
+                    <p>{{ event.ticketTypes.length ? event.ticketTypes[0].price : 'N/A' }} د.ع</p>
                     <i class="ri-calendar-2-line"></i>
                   </div>
                   <div class="date">
-                    <p>{{ event.organizer }}</p>
+                    <p>{{ event.ticketTypes.length ? event.ticketTypes[0].title : 'No ticket types available' }}</p>
                     <i class="ri-calendar-2-line"></i>
                   </div>
                 </div>
@@ -39,7 +39,7 @@
                   <button><span>حجز تذكرة</span></button>
                   <div class="price">
                     <p>يبدء سعر حجز التذاكر</p>
-                    <div class="iq">{{ event.price }} د.ع</div>
+                    <div class="iq">{{ event.ticketTypes.length ? event.ticketTypes[0].price : 'N/A' }} د.ع</div>
                   </div>
                 </div>
               </div>
@@ -52,62 +52,20 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import Swiper from 'swiper';
 import { Navigation } from "swiper/modules";
 import 'swiper/swiper-bundle.css';
+import { useEventsStore } from '~/stores/events'; // Adjust the path as per your actual file structure
 
 // Swiper setup
 Swiper.use([Navigation]);
 
-
-const events = ref([
-  {
-    date: { day: 12, month: 'OTC', full: '12-اكتوبر 2025' },
-    title: 'Lorem ipsum dolor sit amet consectetur.',
-    time: '05 : 00 PM',
-    organizer: 'ينضم بوساطة ABC Group',
-    price: '20,000'
-  },
-  // Add more event objects here
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  },
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  },
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  },
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  },
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  }
-]);
+const eventsStore = useEventsStore();
 
 onMounted(() => {
+  eventsStore.fetchEvents(eventsStore.PageNumber, eventsStore.PageSize, eventsStore.categoryId, eventsStore.collectionId);
+
   let swiper;
 
   function initSwiper() {
@@ -124,27 +82,7 @@ onMounted(() => {
     });
   }
 
-  function updateSwiperSettings() {
-    if (window.matchMedia('(max-width: 900px)').matches) {
-      if (swiper.params.slidesPerView !== 'auto') {
-        swiper.params.slidesPerView = 'auto';
-        swiper.update();
-      }
-    } else if (window.matchMedia('(max-width: 480px)').matches) {
-      if (swiper.params.slidesPerView !== 'auto') {
-        swiper.params.slidesPerView = 'auto';
-        swiper.update();
-      }
-    } else {
-      if (swiper.params.slidesPerView !== 'auto') {
-        swiper.params.slidesPerView = 'auto';
-        swiper.update();
-      }
-    }
-  }
-
   initSwiper();
-  window.addEventListener('resize', updateSwiperSettings);
 });
 </script>
 

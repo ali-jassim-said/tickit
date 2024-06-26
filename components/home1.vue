@@ -101,7 +101,7 @@ onMounted(() => {
       nextEl: '.next',
       prevEl: '.prev',
     },
-    slidesPerView: 3,
+    slidesPerView: 'auto',
     spaceBetween: 10,
     centeredSlides: true,
     fade: true,

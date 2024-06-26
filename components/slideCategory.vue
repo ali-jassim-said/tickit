@@ -1,26 +1,26 @@
 <template>
   <div class="category-picture">
-    <div class="text-imgs">
-      <img src="../public/img/text2.png" alt="" />
-      <img src="../public/img/text1.png" alt="" />
-    </div>
-    <div class="icons-category">
-      <i class="ri-arrow-left-s-line next3"></i>
-      <i class="ri-arrow-right-s-line prev3"></i>
-    </div>
-    <div class="slide-middle swiper-container3">
-      <div class="swiper-wrapper">
-        <div
-          class="swiper-slide card-middle"
-          v-for="(item, index) in categories"
-          :key="index"
-          :class="{ 'active-slide': index === activeIndex }"
-        >
-          <div>{{ item.order }}</div>
-          <p>{{ item.name }}</p>
+    <img src="../public/img/text2.png" alt="" />
+    <div class="middle swiper-container3">
+      <div class="icons-category">
+        <i class="ri-arrow-left-s-line prev3"></i>
+        <i class="ri-arrow-right-s-line next3"></i>
+      </div>
+      <div class="slide-middle">
+        <div class="swiper-wrapper">
+          <div
+            class="swiper-slide card-middle"
+            v-for="(item, index) in categories"
+            :key="index"
+            :class="{ 'active-slide': index === activeIndex }"
+          >
+            <div>{{ item.order }}</div>
+            <p>{{ item.name }}</p>
+          </div>
         </div>
       </div>
     </div>
+    <img class="pic2" src="../public/img/text1.png" alt="" />
   </div>
 </template>
 
@@ -37,6 +37,7 @@ Swiper.use([Navigation]);
 const categoriesStore = useCategoriesStore();
 const categories = ref([]);
 const error = ref(null);
+const activeIndex = ref(0);
 
 const fetchCategories = async () => {
   await categoriesStore.fetchCategories();
@@ -45,21 +46,23 @@ const fetchCategories = async () => {
 };
 
 const initSwiper = () => {
-  const swiperContainer = document.querySelector(".swiper-container3");
+  const swiperContainer = document.querySelector(".swiper-container3 .slide-middle");
   const swiperOptions = {
     navigation: {
       nextEl: ".next3",
       prevEl: ".prev3",
     },
-    slidesPerView: "auto",
+    slidesPerView: 'auto',
     spaceBetween: 7,
     loop: categories.value.length > 1, // Enable loop only if there are enough slides
     centeredSlides: false,
     fade: true,
   };
 
-  if (swiperContainer.swiper) {
-    swiperContainer.swiper.destroy(true, true); // Destroy previous Swiper instance if exists
+  
+
+  if (swiperContainer) {
+    new Swiper(swiperContainer, swiperOptions);
   }
 
   new Swiper(swiperContainer, swiperOptions);
@@ -77,7 +80,7 @@ watch(categories, () => {
 });
 </script>
 
-<style>
+<style scoped>
 .category-picture {
   background-image: url("../public/img/categoryPic.png");
   background-position: center center;
@@ -85,41 +88,27 @@ watch(categories, () => {
   background-repeat: no-repeat;
   width: 100%;
   height: 302px;
-  position: relative;
   margin: 100px 0px;
-}
-
-.category-picture .text-imgs {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70%;
-  height: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  user-select: none;
+  justify-content: center;
 }
 
-.category-picture .text-imgs :nth-child(1) {
+.category-picture img:nth-child(1) {
   width: 231px;
-  height: 98px;
+  height: 130px;
 }
 
-.category-picture .text-imgs :nth-child(2) {
-  width: 137px;
-  height: 98px;
+.category-picture .pic2 {
+  width: 137px !important;
+  height: 98px !important;
 }
 
 .icons-category {
   position: absolute;
-  top: 50%;
-  left: 53%;
-  transform: translate(-50%, -50%);
-  width: 51%;
-  height: 10%;
+  width: 100%;
   display: flex;
+  align-items: center;
   justify-content: space-between;
 }
 
@@ -137,20 +126,6 @@ watch(categories, () => {
   color: #fff;
   cursor: pointer;
   z-index: 100;
-}
-
-.slide-middle {
-  position: absolute;
-  top: 50%;
-  left: 53%;
-  transform: translate(-50%, -50%);
-  width: 48%;
-  height: 70%;
-  z-index: 1;
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
-  gap: 10px;
 }
 
 .card-middle {
@@ -189,5 +164,16 @@ watch(categories, () => {
 
 .active-slide {
   background: rgba(255, 255, 255, 1);
+}
+
+.middle {
+  overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.slide-middle{
+  overflow: hidden;
 }
 </style>

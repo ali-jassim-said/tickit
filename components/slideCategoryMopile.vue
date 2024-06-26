@@ -93,7 +93,7 @@ onMounted(() => {
 }
 
 .container-slide .card {
-  width: 146px !important;
+  width: 160px;
   height: 68px;
   padding: 18px 24px 18px 24px;
   display: flex;
@@ -160,3 +160,5 @@ onMounted(() => {
   color: rgba(34, 129, 217, 1);
 }
 </style>
+
+
