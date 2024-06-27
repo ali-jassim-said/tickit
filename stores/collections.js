@@ -7,7 +7,7 @@ export const useCollectionStore = defineStore('collection', {
     collections: [],
     error: null,
     loading: false,
-    events: [],
+    events: {},
     eventError: null,
     eventLoading: false,
   }),
@@ -17,7 +17,12 @@ export const useCollectionStore = defineStore('collection', {
       this.error = null;
       try {
         const response = await getCustomerCollections();
-        this.collections = response.data.collections;
+        this.collections = response.data.collections.filter(collection => collection.collectionType === 2);
+        
+        // Fetch events for each collection
+        await Promise.all(this.collections.map(async (collection) => {
+          await this.fetchEventsByCollection(1, 10, collection.id);
+        }));
       } catch (error) {
         this.error = 'Failed to fetch collections.';
         console.error('Error fetching collections:', error);
@@ -31,15 +36,7 @@ export const useCollectionStore = defineStore('collection', {
       this.eventError = null;
       try {
         const response = await getCustomerEvents({ PageNumber: pageNumber, PageSize: pageSize, collectionId: collectionId });
-        
-        if (response.data && response.data.data) {
-          this.events = response.data.data.map(event => ({
-            ...event,
-            description: event.description || 'No description available'
-          }));
-        } else {
-          this.events = [];
-        }
+        this.events = { ...this.events, [collectionId]: response.data.data };
       } catch (error) {
         this.eventError = 'Failed to fetch events.';
         console.error('Error fetching events:', error);
