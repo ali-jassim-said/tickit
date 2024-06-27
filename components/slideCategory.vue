@@ -1,10 +1,10 @@
 <template>
   <div class="category-picture">
-    <img src="../public/img/text2.png" alt="" />
+    <img class="pic2" src="../public/img/text1.png" alt="" />
     <div class="middle swiper-container3">
       <div class="icons-category">
-        <i class="ri-arrow-left-s-line prev3"></i>
         <i class="ri-arrow-right-s-line next3"></i>
+        <i class="ri-arrow-left-s-line prev3"></i>
       </div>
       <div class="slide-middle">
         <div class="swiper-wrapper">
@@ -14,13 +14,13 @@
             :key="index"
             :class="{ 'active-slide': index === activeIndex }"
           >
-            <div>{{ item.order }}</div>
+            <i>{{ item.order }}</i>
             <p>{{ item.name }}</p>
           </div>
         </div>
       </div>
     </div>
-    <img class="pic2" src="../public/img/text1.png" alt="" />
+    <img src="../public/img/text2.png" alt="" />
   </div>
 </template>
 
@@ -82,6 +82,7 @@ watch(categories, () => {
 
 <style scoped>
 .category-picture {
+  direction: rtl;
   background-image: url("../public/img/categoryPic.png");
   background-position: center center;
   background-size: cover;

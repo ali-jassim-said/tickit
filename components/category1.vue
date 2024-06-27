@@ -9,13 +9,25 @@
           </div>
           <div class="text">أكتشف جميع الاحداث</div>
         </div>
-        <div class="category-cards swiper-container4" style="overflow: hidden;">
+        <div class="category-cards swiper-container4" style="overflow: hidden">
           <div class="swiper-wrapper">
-            <div v-for="(event, index) in eventsStore.events" :key="index" class="card swiper-slide">
+            <div
+              v-for="(event, index) in eventsStore.events"
+              :key="index"
+              class="card swiper-slide"
+            >
               <div class="card-img">
                 <div class="date">
-                  <p class="number">{{ new Date(event.startDate).getDate() }}</p>
-                  <p class="text">{{ new Date(event.startDate).toLocaleString('default', { month: 'short' }) }}</p>
+                  <p class="number">
+                    {{ new Date(event.startDate).getDate() }}
+                  </p>
+                  <p class="text">
+                    {{
+                      new Date(event.startDate).toLocaleString("default", {
+                        month: "short",
+                      })
+                    }}
+                  </p>
                 </div>
                 <i class="ri-calendar-2-line"></i>
               </div>
@@ -27,11 +39,24 @@
                     <i class="ri-calendar-2-line"></i>
                   </div>
                   <div class="date">
-                    <p>{{ event.ticketTypes.length ? event.ticketTypes[0].price : 'N/A' }} د.ع</p>
+                    <p>
+                      {{
+                        event.ticketTypes.length
+                          ? event.ticketTypes[0].price
+                          : "N/A"
+                      }}
+                      د.ع
+                    </p>
                     <i class="ri-calendar-2-line"></i>
                   </div>
                   <div class="date">
-                    <p>{{ event.ticketTypes.length ? event.ticketTypes[0].title : 'No ticket types available' }}</p>
+                    <p>
+                      {{
+                        event.ticketTypes.length
+                          ? event.ticketTypes[0].title
+                          : "No ticket types available"
+                      }}
+                    </p>
                     <i class="ri-calendar-2-line"></i>
                   </div>
                 </div>
@@ -39,7 +64,14 @@
                   <button><span>حجز تذكرة</span></button>
                   <div class="price">
                     <p>يبدء سعر حجز التذاكر</p>
-                    <div class="iq">{{ event.ticketTypes.length ? event.ticketTypes[0].price : 'N/A' }} د.ع</div>
+                    <div class="iq">
+                      {{
+                        event.ticketTypes.length
+                          ? event.ticketTypes[0].price
+                          : "N/A"
+                      }}
+                      د.ع
+                    </div>
                   </div>
                 </div>
               </div>
@@ -52,11 +84,11 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import Swiper from 'swiper';
+import { onMounted } from "vue";
+import Swiper from "swiper";
 import { Navigation } from "swiper/modules";
-import 'swiper/swiper-bundle.css';
-import { useEventsStore } from '~/stores/events'; // Adjust the path as per your actual file structure
+import "swiper/swiper-bundle.css";
+import { useEventsStore } from "~/stores/events"; 
 
 // Swiper setup
 Swiper.use([Navigation]);
@@ -64,17 +96,22 @@ Swiper.use([Navigation]);
 const eventsStore = useEventsStore();
 
 onMounted(() => {
-  eventsStore.fetchEvents(eventsStore.PageNumber, eventsStore.PageSize, eventsStore.categoryId, eventsStore.collectionId);
+  eventsStore.fetchEvents(
+    eventsStore.PageNumber,
+    eventsStore.PageSize,
+    eventsStore.categoryId,
+    eventsStore.collectionId
+  );
 
   let swiper;
 
   function initSwiper() {
-    swiper = new Swiper('.swiper-container4', {
+    swiper = new Swiper(".swiper-container4", {
       navigation: {
-        nextEl: '.next4',
-        prevEl: '.prev4',
+        nextEl: ".next4",
+        prevEl: ".prev4",
       },
-      slidesPerView: 'auto',
+      slidesPerView: "auto",
       spaceBetween: 5,
       loop: true,
       centeredSlides: false,
@@ -87,9 +124,6 @@ onMounted(() => {
 </script>
 
 <style>
-
-
-
 .section-category {
   direction: rtl;
   width: 100%;
@@ -110,68 +144,64 @@ onMounted(() => {
 .category .header {
   height: 24px;
   display: flex;
-  flex-direction: row;
+  flex-direction: row-reverse;
   justify-content: space-between;
 }
 
-.category .header .text{
-  
-font-size: 20px;
-font-weight: 700;
-line-height: 24.38px;
+.category .header .text {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 24.38px;
 }
 
-.category .header .icons{
+.category .header .icons {
   display: flex;
   flex-direction: row;
-gap: 12px;
-
+  gap: 12px;
 }
 
-.category .header .icons i{
+.category .header .icons i {
   width: 24px;
-height: 24px;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 8px;
-border-radius: 100px;
-border: 1px;
-background: rgba(0, 0, 0, 0.1);
-border: 1px solid rgba(0, 0, 0, 0.15);
-cursor: pointer;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 100px;
+  border: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  cursor: pointer;
 }
 
-.category-cards{
-height: 418px;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 14px;
+.category-cards {
+  height: 418px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
 }
 
-.category-cards .card{
+.category-cards .card {
   width: 279px !important;
-height: 415px;
-padding: 16px;
-display: flex;
-flex-direction: column;
-align-items: end;
-gap: 9px;
-border-radius: 12px;
-cursor: pointer;
+  height: 415px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 9px;
+  border-radius: 12px;
+  cursor: pointer;
 
-background: rgba(255, 255, 255, 1);
-
-
+  background: rgba(255, 255, 255, 1);
 }
 
-.category-cards .card .card-img{
+.category-cards .card .card-img {
   width: 247px;
-height: 231px;
-border-radius: 8px;
-background-image: url('../public/img/category.png');
-background-position: center center;
+  height: 231px;
+  border-radius: 8px;
+  background-image: url("../public/img/category.png");
+  background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
@@ -179,31 +209,35 @@ background-position: center center;
 
 .card .card-img .date {
   width: 60px;
-height: 60px;
-border-radius: 8px 8px 0px 0px;
-border: 0px 0px 2px 0px;
-background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 100%);
-position: absolute;
-bottom: 0;
-right: 15px;
-display: flex;
-align-items: center;
-justify-content: center;
-flex-direction: column;
+  height: 60px;
+  border-radius: 8px 8px 0px 0px;
+  border: 0px 0px 2px 0px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  position: absolute;
+  bottom: 0;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
-.card .card-img .date .number{
-font-size: 24px;
-font-weight: 700;
-line-height: 28.8px;
-color: rgba(255, 255, 255, 1);
+.card .card-img .date .number {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28.8px;
+  color: rgba(255, 255, 255, 1);
 }
 
-.card .card-img .date .text{
-font-size: 14px;
-font-weight: 400;
-line-height: 16.8px;
-color: rgba(255, 255, 255, 1);
+.card .card-img .date .text {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16.8px;
+  color: rgba(255, 255, 255, 1);
 }
 
 .card .card-img i {
@@ -211,105 +245,104 @@ color: rgba(255, 255, 255, 1);
   bottom: 15px;
   left: 15px;
   font-size: 20px;
-color: #fff;
+  color: #fff;
 }
 
-.category-cards .card .card-text{
+.category-cards .card .card-text {
+  direction: ltr;
   width: 247px;
-height: 143px;
-display: flex;
-flex-direction: column;
-gap: 12px;
+  height: 143px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.category-cards .card .card-text .card-date{
+.category-cards .card .card-text .card-date {
   width: 247px;
-height: 92px;
-display: flex;
-flex-direction: column;
-gap: 8px;
+  height: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .card-date p {
-font-size: 12px;
-font-weight: 700;
-line-height: 14.4px;
-text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 14.4px;
+  text-align: right;
 }
 
-.card-date .date{
-  
-height: 18px;
-display: flex;
-align-items: center;
-justify-content: end;
-gap: 8px;
+.card-date .date {
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: 8px;
 }
 
 .card-date .date p {
-font-size: 12px;
-font-weight: 400;
-line-height: 14.4px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14.4px;
 }
 
-.card-date .date i{
-  color:rgba(0, 0, 0, 0.25)
+.card-date .date i {
+  color: rgba(0, 0, 0, 0.25);
 }
 
-.card .card-text .card-price{
-height: 39px;
-display: flex;
-flex-direction: row;
-align-items: center;
-justify-content: space-between;
-gap: 31px;
+.card .card-text .card-price {
+  height: 39px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 31px;
 }
 
-.card .card-text .card-price .price{
-height: 36px;
-display: flex;
-align-items: center;
-flex-direction: column;
-gap: 2px;
+.card .card-text .card-price .price {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.card .card-text .card-price .price p{
-font-size: 12px;
-font-weight: 400;
-line-height: 14.4px;
-color: rgba(29, 35, 41, 0.5);
+.card .card-text .card-price .price p {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14.4px;
+  color: rgba(29, 35, 41, 0.5);
 }
 
-.card .card-text .card-price .price .iq{
-font-size: 16px;
-font-weight: 700;
-line-height: 19.5px;
-color: rgba(29, 35, 41, 1);
+.card .card-text .card-price .price .iq {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19.5px;
+  color: rgba(29, 35, 41, 1);
 }
 
-.card .card-text .card-price  button{
-height: 39px;
-padding: 12px 32px 12px 32px;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 10px;
-border-radius: 8px;
-border: 1.5px;
-border: 1.5px solid rgba(34, 129, 217, 1)
+.card .card-text .card-price button {
+  height: 39px;
+  padding: 12px 32px 12px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 8px;
+  border: 1.5px;
+  border: 1.5px solid rgba(34, 129, 217, 1);
 }
 
-
-.card .card-text .card-price  button span{
-font-size: 12px;
-font-weight: 400;
-line-height: 14.63px;
-color: rgba(34, 129, 217, 1);
+.card .card-text .card-price button span {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14.63px;
+  color: rgba(34, 129, 217, 1);
 }
 
-.swiper-wrapper{
+.swiper-wrapper {
   transition-duration: 0ms;
-  transform: none; 
+  transform: none;
   transition-delay: 0ms;
 }
 </style>

@@ -4,8 +4,8 @@
       <div class="category">
         <div class="header">
           <div class="icons">
-            <i class="ri-arrow-right-s-line prev4"></i>
-            <i class="ri-arrow-left-s-line next4"></i>
+            <i class="ri-arrow-right-s-line prev2"></i>
+            <i class="ri-arrow-left-s-line next2"></i>
           </div>
           <div class="text">الاحداث الاشهر في الرياضة</div>
         </div>
