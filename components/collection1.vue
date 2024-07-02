@@ -1,21 +1,21 @@
 <template>
   <div class="section-category">
-    <div class="container">
+    <div class="container" v-for="(collection, collectionIndex) in collections" :key="collectionIndex">
       <div class="category">
         <div class="header">
           <div class="icons">
-            <i class="ri-arrow-right-s-line prev1"></i>
-            <i class="ri-arrow-left-s-line next1"></i>
+            <i :class="`prev${collectionIndex} ri-arrow-right-s-line`"></i>
+            <i :class="`next${collectionIndex} ri-arrow-left-s-line`"></i>
           </div>
-          <div class="text">الاحداث المضافة حديثاً</div>
+          <div class="text">{{ collection.name }}</div>
         </div>
-        <div class="category-cards swiper-container1" style="overflow: hidden;">
+        <div :class="`swiper-container${collectionIndex} category-cards swiper-container`" style="overflow: hidden">
           <div class="swiper-wrapper">
-            <div v-for="(event, index) in events" :key="index" class="card swiper-slide">
+            <div v-for="(event, index) in events[collection.id]" :key="index" class="card swiper-slide">
               <div class="card-img">
                 <div class="date">
-                  <p class="number">{{ event.date.day }}</p>
-                  <p class="text">{{ event.date.month }}</p>
+                  <p class="number">{{ new Date(event.startDate).getDate() }}</p>
+                  <p class="text">{{ new Date(event.startDate).toLocaleString('default', { month: 'short' }) }}</p>
                 </div>
                 <i class="ri-calendar-2-line"></i>
               </div>
@@ -23,15 +23,15 @@
                 <div class="card-date">
                   <p>{{ event.title }}</p>
                   <div class="date">
-                    <p>{{ event.date.full }}</p>
+                    <p>{{ new Date(event.startDate).toLocaleDateString() }}</p>
                     <i class="ri-calendar-2-line"></i>
                   </div>
                   <div class="date">
-                    <p>{{ event.time }}</p>
+                    <p>{{ event.ticketTypes.length ? event.ticketTypes[0].price : 'N/A' }} د.ع</p>
                     <i class="ri-calendar-2-line"></i>
                   </div>
                   <div class="date">
-                    <p>{{ event.organizer }}</p>
+                    <p>{{ event.ticketTypes.length ? event.ticketTypes[0].title : 'No ticket types available' }}</p>
                     <i class="ri-calendar-2-line"></i>
                   </div>
                 </div>
@@ -39,7 +39,7 @@
                   <button><span>حجز تذكرة</span></button>
                   <div class="price">
                     <p>يبدء سعر حجز التذاكر</p>
-                    <div class="iq">{{ event.price }} د.ع</div>
+                    <div class="iq">{{ event.ticketTypes.length ? event.ticketTypes[0].price : 'N/A' }} د.ع</div>
                   </div>
                 </div>
               </div>
@@ -54,79 +54,45 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import Swiper from 'swiper';
-import { Navigation } from "swiper/modules";
+import { Navigation } from 'swiper/modules';
 import 'swiper/swiper-bundle.css';
+import { useCollectionStore } from '~/stores/collectionsAll';
 
-// Swiper setup
 Swiper.use([Navigation]);
 
+const collectionStoreAll = useCollectionStore();
 
-const events = ref([
-  {
-    date: { day: 12, month: 'OTC', full: '12-اكتوبر 2025' },
-    title: 'Lorem ipsum dolor sit amet consectetur.',
-    time: '05 : 00 PM',
-    organizer: 'ينضم بوساطة ABC Group',
-    price: '20,000'
-  },
-  // Add more event objects here
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  },
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  },
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  },
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  },
-  {
-    date: { day: 13, month: 'NOV', full: '13-نوفمبر 2025' },
-    title: 'Event Title Example',
-    time: '06 : 00 PM',
-    organizer: 'ينضم بوساطة XYZ Group',
-    price: '30,000'
-  }
-]);
+const collections = ref([]);
+const events = ref({});
 
-onMounted(() => {
-  let swiper;
+onMounted(async () => {
+  await collectionStoreAll.fetchCollections();
+  collections.value = collectionStoreAll.collections;
+  console.log(collections.value);
 
-  function initSwiper() {
-    swiper = new Swiper('.swiper-container1', {
-      navigation: {
-        nextEl: '.next1',
-        prevEl: '.prev1',
-      },
-      slidesPerView: 'auto',
-      spaceBetween: 5,
-      loop: true,
-      centeredSlides: false,
-      fade: true,
-    });
-  }
-
-  initSwiper();
+  collections.value.forEach((collection, index) => {
+    if (collectionStoreAll.events[collection.id]) {
+      events.value[collection.id] = collectionStoreAll.events[collection.id];
+    }
+    initSwiper(index);
+  });
 });
+
+function initSwiper(index) {
+  new Swiper(`.swiper-container${index}`, {
+    navigation: {
+      nextEl: `.next${index}`,
+      prevEl: `.prev${index}`,
+    },
+    slidesPerView: 'auto',
+    spaceBetween: 5,
+    loop: true,
+    centeredSlides: false,
+  });
+}
 </script>
+
+
 
 <style>
 

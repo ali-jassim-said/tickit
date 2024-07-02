@@ -11,12 +11,12 @@
       <div class="swiper-wrapper container-slide">
         <div
           class="swiper-slide card"
-          v-for="(slide, index) in slides"
-          :key="index"
+          v-for="(category, index) in categories"
+          :key="category.id"
           :class="{ active: isActiveSlide(index) }"
-          @click="updateActiveSlide(slide)"
+          @click="updateActiveSlide(category)"
         >
-          <h3>{{ slide.text }}</h3>
+          <h3>{{ category.name }}</h3>
           <i class="ri-calendar-2-line"></i>
         </div>
       </div>
@@ -25,38 +25,61 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import Swiper from "swiper";
 import "swiper/swiper-bundle.css";
+import { useCategoriesStore } from "@/stores/categories";
 
-const slides = ref([
-  { text: "الرياضة" },
-  { text: "الرياضة" },
-  { text: "الرياضة" },
-  { text: "الرياضة" },
-]);
-
+const categoriesStore = useCategoriesStore();
+const categories = ref([]);
+const error = ref(null);
 const activeIndex = ref(0);
 
-function updateActiveSlide(slide) {
-  activeIndex.value = slides.value.indexOf(slide);
+const fetchCategories = async () => {
+  try {
+    await categoriesStore.fetchCategories();
+    categories.value = categoriesStore.categories;
+    error.value = categoriesStore.error;
+  } catch (err) {
+    console.error('Error fetching categories:', err);
+    error.value = 'Failed to fetch categories.';
+  }
+};
+
+const initSwiper = () => {
+  const swiperContainer = document.querySelector(".swiper-containerM2");
+  if (swiperContainer) {
+    new Swiper(swiperContainer, {
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      centeredSlides: false,
+      loop: true,
+      fadeEffect: { crossFade: true },
+      effect: "fade",
+    });
+  }
+};
+
+function updateActiveSlide(category) {
+  activeIndex.value = categories.value.indexOf(category);
 }
 
 function isActiveSlide(index) {
   return index === activeIndex.value;
 }
 
-onMounted(() => {
-  new Swiper(".swiper-containerM2", {
-    slidesPerView: 'auto',
-    spaceBetween: 20,
-    centeredSlides: false,
-    loop: true,
-    fadeEffect: { crossFade: true },
-    effect: "fade",
-  });
+onMounted(async () => {
+  await fetchCategories();
+  initSwiper();
+});
+
+watch(categories, () => {
+  if (categories.value.length > 0) {
+    initSwiper();
+  }
 });
 </script>
+
 
 <style scoped>
 .category-picture {

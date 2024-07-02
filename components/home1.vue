@@ -2,7 +2,7 @@
   <div class="home" :style="{ backgroundImage: `url(${activeSlideImage}) !important` }">
     <nav class="nav-home">
       <div class="svg-nav">
-        <img src="../public/svg/Logo.svg" alt="svg-home" />
+        <img src="/svg/Logo.svg" alt="svg-home" />
       </div>
       <div class="nav-login">
         <button>Login</button>
@@ -16,34 +16,28 @@
           <i class="ri-arrow-right-s-line next"></i>
         </div>
         <div class="collections-text">
-          <p>الاحداث الاكثر حجزا</p>
+          <p>{{ selectedCollection.name }}</p>
         </div>
       </div>
       <div class="collections-cards">
         <div class="card-text">
-          <h2>{{ activeSlideText }}</h2>
-          <p>
-            Lorem ipsum dolor sit amet consectetur. Curabitur morbi est euismod
-            mi sed morbi odio feugiat convallis. Phasellus blandit donec turpis
-            adipiscing. Sed interdum leo in scelerisque elementum massa eros
-            morbi lectus. Malesuada vivamus nec pharetra interdum molestie.
-          </p>
+          <h2>{{ activeEvent.title || 'No title available' }}</h2>
+          <p>{{ activeEvent.description || 'No description available' }}</p>
         </div>
-        
-          <div class="  swiper-container" style="overflow: hidden;  direction: rtl;">
-            <div class="cards swiper-wrapper">
+        <div class="swiper-container" style="overflow: hidden; direction: rtl; width: 50%;">
+          <div class="cards swiper-wrapper">
             <div
               class="swiper-slide card"
-              v-for="(slide, index) in slides"
-              :key="index"
-              @click="updateActiveSlide(slide)"
+              v-for="(event, index) in events[selectedCollection.id] || []"
+              :key="event.id"
+              @click="updateActiveSlide(event)"
               :class="{ active: isActiveSlide(index) }"
             >
               <div class="img">
-                <img :src="slide.image" alt="" />
+                <img :src="eventImage(event)" alt="" />
               </div>
               <div class="text">
-                <h2 :class="{ activeText: isActiveSlide(index) }">{{ slide.text }}</h2>
+                <h2 :class="{ activeText: isActiveSlide(index) }">{{ event.title || 'No title available' }}</h2>
               </div>
             </div>
           </div>
@@ -58,44 +52,92 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import Swiper from 'swiper';
 import 'swiper/swiper-bundle.css';
+import { useCollectionStore } from '@/stores/collections';
 
-const slides = ref([
-  {
-    image: "/img/home.png",
-    text: "Lorem ipsum dolor sit amet consectetur 1.",
-  },
-  {
-    image: "/img/home2.png",
-    text: "Lorem ipsum dolor sit amet consectetur 2.",
-  },
-  {
-    image: "/img/home.png",
-    text: "Lorem ipsum dolor sit amet consectetur 3.",
-  },
-  {
-    image: "/img/home.png",
-    text: "Lorem ipsum dolor sit amet consectetur 4.",
-  },
-]);
+const collectionStore = useCollectionStore();
 
-const activeSlideText = ref(slides.value[0].text);
-const activeSlideImage = ref(slides.value[0].image);
+const collections = ref([]);
+const events = ref({});
+const error = ref(null);
+const eventError = ref(null);
+const selectedCollection = ref({});
+const activeEvent = ref({});
+const activeSlideImage = ref('');
 const activeIndex = ref(0);
 
-function updateActiveSlide(slide) {
-  activeSlideText.value = slide.text;
-  activeSlideImage.value = slide.image;
-  activeIndex.value = slides.value.findIndex((s) => s === slide);
-}
+const fetchCollections = async () => {
+  try {
+    await collectionStore.fetchCollections();
+    collections.value = collectionStore.collections;
+    events.value = collectionStore.events;
+    error.value = collectionStore.error;
+    eventError.value = collectionStore.eventError;
 
-function isActiveSlide(index) {
+    // Filter collections where collectionType === 2
+    const filteredCollections = collections.value.filter(collection => collection.collectionType === 2);
+    selectedCollection.value = filteredCollections.length > 0 ? filteredCollections[0] : {};
+
+    if (events.value[selectedCollection.value.id] && events.value[selectedCollection.value.id].length > 0) {
+      activeEvent.value = events.value[selectedCollection.value.id][0];
+      activeSlideImage.value = eventImage(activeEvent.value);
+    }
+  } catch (err) {
+    console.error('Error fetching collections:', err);
+    error.value = 'Failed to fetch collections.';
+  }
+};
+
+const eventImage = (event) => {
+  if (!event || !event.images) {
+    return '/path/to/default-image.jpg'; // Replace with a default image path if needed
+  }
+  const image = event.images.find(image => image.eventImageType === 1);
+  return image ? `https://${image.imageUrl}` : '/path/to/default-image.jpg'; // Replace with a default image path if needed
+};
+
+const updateActiveSlide = (event) => {
+  activeEvent.value = event;
+  activeSlideImage.value = eventImage(event);
+  activeIndex.value = events.value[selectedCollection.value.id].findIndex((e) => e.id === event.id);
+};
+
+const isActiveSlide = (index) => {
   return index === activeIndex.value;
-}
+};
 
-onMounted(() => {
+watch(
+  () => collectionStore.collections,
+  (newCollections) => {
+    collections.value = newCollections;
+  }
+);
+
+watch(
+  () => collectionStore.events,
+  (newEvents) => {
+    events.value = newEvents;
+  }
+);
+
+watch(
+  () => collectionStore.error,
+  (newError) => {
+    error.value = newError;
+  }
+);
+
+watch(
+  () => collectionStore.eventError,
+  (newEventError) => {
+    eventError.value = newEventError;
+  }
+);
+
+onMounted(async () => {
+  await fetchCollections();
   new Swiper('.swiper-container', {
     navigation: {
       nextEl: '.next',
@@ -103,43 +145,23 @@ onMounted(() => {
     },
     slidesPerView: 'auto',
     spaceBetween: 10,
-    centeredSlides: true,
-    fade: true,
+    centeredSlides: false,
     loop: true,
+    fadeEffect: { crossFade: true },
+    effect: 'fade',
   });
 });
 </script>
+
+
 <style scoped>
 
-/*
-import { onMounted, ref } from "vue";
-import { useCategoriesStore } from "@/stores/categories";
 
-
-
-
-const categoriesStore = useCategoriesStore();
-const categories = ref([]);
-const error = ref(null);
-
-
-
-const fetchCategories = async () => {
-  await categoriesStore.fetchCategories();
-  categories.value = categoriesStore.categories;
-  error.value = categoriesStore.error;
-};
-
-onMounted(async () => {
-  await fetchCategories();
-});
-*/
-
-.active{
+.active {
   background-color: #fff !important;
 }
 
-.activeText{
+.activeText {
   color: black !important;
 }
 
@@ -194,8 +216,8 @@ onMounted(async () => {
 
 .nav-login {
   width: 90px;
-    height: 24px;
-    padding: 10px 20px 10px 20px;
+  height: 24px;
+  padding: 10px 20px 10px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -281,6 +303,7 @@ onMounted(async () => {
 
 .collections-cards .card-text {
   height: 191px;
+  width: 50%;
   justify-content: space-between;
   border-right: 2px solid rgba(255, 255, 255, 1);
   padding-right: 15px;
@@ -306,7 +329,7 @@ onMounted(async () => {
   height: 216px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 18px;
 }
 
@@ -316,7 +339,7 @@ onMounted(async () => {
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: start;
   padding: 9px;
   background: linear-gradient(
     180deg,

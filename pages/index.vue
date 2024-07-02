@@ -7,7 +7,6 @@
  <collection2/>
  <category1/>
  <footer-up/>
- <home2/>
 </template>
 
 <script setup>

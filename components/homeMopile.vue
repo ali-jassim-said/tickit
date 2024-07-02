@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="home"
-    :style="{ backgroundImage: `url(${activeSlideImage}) !important` }"
-  >
+  <div class="home" :style="{ backgroundImage: `url(${activeSlideImage}) !important` }">
     <nav class="nav-home">
       <div class="svg-nav">
         <img src="../public/svg/Logo.svg" alt="svg-home" />
@@ -15,24 +12,19 @@
     <div class="collections">
       <div class="collections-cards">
         <div class="card-text">
-          <h2>{{ activeSlideText }}</h2>
-          <p>
-            Lorem ipsum dolor sit amet consectetur. Curabitur morbi est euismod
-            mi sed morbi odio feugiat convallis. Phasellus blandit donec turpis
-            adipiscing. Sed interdum leo in scelerisque elementum massa eros
-            morbi lectus. Malesuada vivamus nec pharetra interdum molestie.
-          </p>
+          <h2>{{ activeEvent.title || 'No title available' }}</h2>
+          <p>{{ activeEvent.description || 'No description available' }}</p>
         </div>
         <div class="swiper-containerM" style="overflow: hidden">
           <div class="swiper-wrapper cards">
             <div
               class="swiper-slide card"
-              v-for="(slide, index) in slides"
-              :key="index"
-              @click="updateActiveSlide(slide)"
+              v-for="(event, index) in events[selectedCollection.id] || []"
+              :key="event.id"
+              @click="updateActiveSlide(event)"
               :class="{ active: isActiveSlide(index) }"
             >
-              <img :src="slide.image" alt="" />
+              <img :src="eventImage(event)" alt="" />
             </div>
           </div>
         </div>
@@ -46,62 +38,107 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import Swiper from "swiper";
-import "swiper/swiper-bundle.css";
+import { ref, onMounted, watch } from 'vue';
+import Swiper from 'swiper';
+import 'swiper/swiper-bundle.css';
+import { useCollectionStore } from '@/stores/collections';
 
-const slides = ref([
-  {
-    image: "/img/home.png",
-    text: "Lorem ipsum dolor sit amet consectetur 1.",
-  },
-  {
-    image: "/img/home2.png",
-    text: "Lorem ipsum dolor sit amet consectetur 2.",
-  },
-  {
-    image: "/img/home.png",
-    text: "Lorem ipsum dolor sit amet consectetur 3.",
-  },
-  {
-    image: "/img/home.png",
-    text: "Lorem ipsum dolor sit amet consectetur 4.",
-  },
-  {
-    image: "/img/home.png",
-    text: "Lorem ipsum dolor sit amet consectetur 4.",
-  },
-  {
-    image: "/img/home.png",
-    text: "Lorem ipsum dolor sit amet consectetur 4.",
-  },
-]);
+const collectionStore = useCollectionStore();
 
-const activeSlideText = ref(slides.value[0].text);
-const activeSlideImage = ref(slides.value[0].image);
+const collections = ref([]);
+const events = ref({});
+const error = ref(null);
+const eventError = ref(null);
+const selectedCollection = ref({});
+const activeEvent = ref({});
+const activeSlideImage = ref('');
 const activeIndex = ref(0);
 
-function updateActiveSlide(slide) {
-  activeSlideText.value = slide.text;
-  activeSlideImage.value = slide.image;
-  activeIndex.value = slides.value.findIndex((s) => s === slide);
-}
+const fetchCollections = async () => {
+  try {
+    await collectionStore.fetchCollections();
+    collections.value = collectionStore.collections;
+    events.value = collectionStore.events;
+    error.value = collectionStore.error;
+    eventError.value = collectionStore.eventError;
 
-function isActiveSlide(index) {
+    // Filter collections where collectionType === 2
+    const filteredCollections = collections.value.filter(collection => collection.collectionType === 2);
+    selectedCollection.value = filteredCollections.length > 0 ? filteredCollections[0] : {};
+
+    if (events.value[selectedCollection.value.id] && events.value[selectedCollection.value.id].length > 0) {
+      activeEvent.value = events.value[selectedCollection.value.id][0];
+      activeSlideImage.value = eventImage(activeEvent.value);
+    }
+  } catch (err) {
+    console.error('Error fetching collections:', err);
+    error.value = 'Failed to fetch collections.';
+  }
+};
+
+const eventImage = (event) => {
+  if (!event || !event.images) {
+    return '/path/to/default-image.jpg'; // Replace with a default image path if needed
+  }
+  const image = event.images.find(image => image.eventImageType === 1);
+  return image ? `https://${image.imageUrl}` : '/path/to/default-image.jpg'; // Replace with a default image path if needed
+};
+
+const updateActiveSlide = (event) => {
+  activeEvent.value = event;
+  activeSlideImage.value = eventImage(event);
+  activeIndex.value = events.value[selectedCollection.value.id].findIndex((e) => e.id === event.id);
+};
+
+const isActiveSlide = (index) => {
   return index === activeIndex.value;
-}
+};
 
-onMounted(() => {
-  new Swiper(".swiper-containerM", {
-    slidesPerView: "auto",
+watch(
+  () => collectionStore.collections,
+  (newCollections) => {
+    collections.value = newCollections;
+  }
+);
+
+watch(
+  () => collectionStore.events,
+  (newEvents) => {
+    events.value = newEvents;
+  }
+);
+
+watch(
+  () => collectionStore.error,
+  (newError) => {
+    error.value = newError;
+  }
+);
+
+watch(
+  () => collectionStore.eventError,
+  (newEventError) => {
+    eventError.value = newEventError;
+  }
+);
+
+onMounted(async () => {
+  await fetchCollections();
+  new Swiper('.swiper-containerM', {
+    slidesPerView: 'auto',
     spaceBetween: 5,
     centeredSlides: false,
     loop: true,
     fadeEffect: { crossFade: true },
     effect: 'fade',
+    navigation: {
+      nextEl: '.next',
+      prevEl: '.prev',
+    },
   });
 });
 </script>
+
 <style scoped>
 
 .active {
@@ -248,6 +285,7 @@ onMounted(() => {
   width: 140px;
   height: 85px;
   display: flex;
+  justify-content: end;
 }
 
 .collections-cards .cards .card {
