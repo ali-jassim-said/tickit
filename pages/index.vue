@@ -4,7 +4,6 @@
  <slide-category v-show="!isMobile"/>
  <slide-category-mopile v-show="isMobile"/>
  <collection1/>
- <collection2/>
  <category1/>
  <footer-up/>
 </template>

@@ -1,6 +1,6 @@
 <template>
   <div class="section-category">
-    <div class="container" v-for="(collection, collectionIndex) in collections" :key="collectionIndex">
+    <div v-if="filteredCollections.length > 0" class="container" v-for="(collection, collectionIndex) in filteredCollections" :key="collectionIndex">
       <div class="category">
         <div class="header">
           <div class="icons">
@@ -9,10 +9,10 @@
           </div>
           <div class="text">{{ collection.name }}</div>
         </div>
-        <div :class="`swiper-container${collectionIndex} category-cards swiper-container`" style="overflow: hidden">
+        <div :class="`swiper-container swiper-container${collectionIndex} category-cards`" style="overflow: hidden">
           <div class="swiper-wrapper">
             <div v-for="(event, index) in events[collection.id]" :key="index" class="card swiper-slide">
-              <div class="card-img">
+              <div class="card-img" :style="{ backgroundImage: `url(${eventImage(event)})` }">
                 <div class="date">
                   <p class="number">{{ new Date(event.startDate).getDate() }}</p>
                   <p class="text">{{ new Date(event.startDate).toLocaleString('default', { month: 'short' }) }}</p>
@@ -48,35 +48,43 @@
         </div>
       </div>
     </div>
+    <div v-else class="no-events-message">No collections with events available.</div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import Swiper from 'swiper';
-import { Navigation } from 'swiper/modules';
+import { ref, onMounted, nextTick } from 'vue';
+import Swiper from 'swiper/bundle';
 import 'swiper/swiper-bundle.css';
-import { useCollectionStore } from '~/stores/collectionsAll';
+import { Navigation } from 'swiper/modules';
+import { useAllCollectionsStore } from '~/stores/collectionsAll';
 
 Swiper.use([Navigation]);
 
-const collectionStoreAll = useCollectionStore();
+const store = useAllCollectionsStore();
 
 const collections = ref([]);
 const events = ref({});
 
-onMounted(async () => {
-  await collectionStoreAll.fetchCollections();
-  collections.value = collectionStoreAll.collections;
-  console.log(collections.value);
+async function fetchData() {
+  await store.fetchCollections();
+  collections.value = store.collections;
+  events.value = store.events;
 
-  collections.value.forEach((collection, index) => {
-    if (collectionStoreAll.events[collection.id]) {
-      events.value[collection.id] = collectionStoreAll.events[collection.id];
-    }
+  await nextTick();
+
+  collections.value.forEach((_, index) => {
     initSwiper(index);
   });
-});
+}
+
+function eventImage(event) {
+  if (!event || !event.images) {
+    return '/path/to/default-image.jpg'; // Replace with a default image path if needed
+  }
+  const image = event.images.find(image => image.eventImageType === 1);
+  return image ? `https://${image.imageUrl}` : '/path/to/default-image.jpg'; // Replace with a default image path if needed
+}
 
 function initSwiper(index) {
   new Swiper(`.swiper-container${index}`, {
@@ -90,11 +98,28 @@ function initSwiper(index) {
     centeredSlides: false,
   });
 }
+
+const filteredCollections = ref([]);
+
+onMounted(() => {
+  fetchData();
+});
+
+// Watch for changes in events to filter out collections with no events
+watch(() => events.value, (newEvents) => {
+  filteredCollections.value = collections.value.filter(collection => newEvents[collection.id] && newEvents[collection.id].length > 0);
+});
 </script>
 
 
-
 <style>
+
+.no-events-message {
+  padding: 20px;
+  text-align: center;
+  font-size: 18px;
+  color: red; /* Adjust color as needed */
+}
 
 .section-category {
   width: 100%;

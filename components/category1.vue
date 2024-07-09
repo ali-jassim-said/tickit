@@ -16,7 +16,7 @@
               :key="index"
               class="card swiper-slide"
             >
-              <div class="card-img">
+              <div class="card-img" :style="{ backgroundImage: 'url(' + eventImage(event) + ')' }">
                 <div class="date">
                   <p class="number">
                     {{ new Date(event.startDate).getDate() }}
@@ -95,6 +95,7 @@ Swiper.use([Navigation]);
 
 const eventsStore = useEventsStore();
 
+// Function to fetch events and initialize Swiper
 onMounted(() => {
   eventsStore.fetchEvents(
     eventsStore.PageNumber,
@@ -121,7 +122,17 @@ onMounted(() => {
 
   initSwiper();
 });
+
+// Function to get the correct image URL for an event
+const eventImage = (event) => {
+  if (!event || !event.images) {
+    return '/path/to/default-image.jpg'; // Replace with your default image path
+  }
+  const image = event.images.find(image => image.eventImageType === 1);
+  return image ? `https://${image.imageUrl}` : '/path/to/default-image.jpg'; // Replace with your default image path
+};
 </script>
+
 
 <style>
 .section-category {

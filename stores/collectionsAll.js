@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { getCustomerCollections } from '~/api/Collection';
 import { getCustomerEvents } from '~/api/Events';
 
-export const useCollectionStore = defineStore('collection', {
+export const useAllCollectionsStore = defineStore('allCollections', {
   state: () => ({
     collections: [],
     error: null,
@@ -10,7 +10,6 @@ export const useCollectionStore = defineStore('collection', {
     events: {},
     eventError: null,
     eventLoading: false,
-    collectionIds: [], // State to store IDs of collections excluding type 2
   }),
   actions: {
     async fetchCollections() {
@@ -18,13 +17,7 @@ export const useCollectionStore = defineStore('collection', {
       this.error = null;
       try {
         const response = await getCustomerCollections();
-        // Filter out collections with collectionType === 2
-        this.collections = response.data.collections.map(collection => collection.collectionType !== 2);
-        console.clear();
-        console.log('this', this.collections)
-        console.log('alisjaldjklsajkldjkslajdkl')
-        // Populate collectionIds with IDs of filtered collections
-        this.collectionIds = this.collections.map(collection => collection.id);
+        this.collections = response.data.collections.filter(collection => collection.collectionType !== 2);
         
         // Fetch events for each collection
         await Promise.all(this.collections.map(async (collection) => {

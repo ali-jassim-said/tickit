@@ -1,20 +1,14 @@
 <template>
   <div class="category-picture">
     <div class="head-category"><span>كلشي</span> موجود بمنصة واحد</div>
-    <div
-      class="swiper-containerM2"
-      style="
-        height: 116px;
-        overflow: hidden;
-      "
-    >
+    <div class="swiper-containerM2" style="height: 116px; overflow: hidden;">
       <div class="swiper-wrapper container-slide">
         <div
           class="swiper-slide card"
           v-for="(category, index) in categories"
           :key="category.id"
-          :class="{ active: isActiveSlide(index) }"
-          @click="updateActiveSlide(category)"
+          :class="{ active: index === activeIndex }"
+          @click="updateActiveSlide(index)"
         >
           <h3>{{ category.name }}</h3>
           <i class="ri-calendar-2-line"></i>
@@ -25,63 +19,50 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import Swiper from "swiper";
 import "swiper/swiper-bundle.css";
 import { useCategoriesStore } from "@/stores/categories";
 
 const categoriesStore = useCategoriesStore();
 const categories = ref([]);
-const error = ref(null);
 const activeIndex = ref(0);
 
 const fetchCategories = async () => {
   try {
     await categoriesStore.fetchCategories();
     categories.value = categoriesStore.categories;
-    error.value = categoriesStore.error;
   } catch (err) {
     console.error('Error fetching categories:', err);
-    error.value = 'Failed to fetch categories.';
   }
 };
 
 const initSwiper = () => {
-  const swiperContainer = document.querySelector(".swiper-containerM2");
-  if (swiperContainer) {
-    new Swiper(swiperContainer, {
-      slidesPerView: 'auto',
-      spaceBetween: 20,
-      centeredSlides: false,
-      loop: true,
-      fadeEffect: { crossFade: true },
-      effect: "fade",
-    });
-  }
+  new Swiper(".swiper-containerM2", {
+    slidesPerView: 'auto',
+    spaceBetween: 10,
+    centeredSlides: false,
+    loop: true,
+    fadeEffect: { crossFade: true },
+    effect: "fade",
+  });
 };
 
-function updateActiveSlide(category) {
-  activeIndex.value = categories.value.indexOf(category);
-}
-
-function isActiveSlide(index) {
-  return index === activeIndex.value;
-}
+const updateActiveSlide = (index) => {
+  activeIndex.value = index;
+};
 
 onMounted(async () => {
   await fetchCategories();
   initSwiper();
 });
-
-watch(categories, () => {
-  if (categories.value.length > 0) {
-    initSwiper();
-  }
-});
 </script>
 
 
-<style scoped>
+
+
+
+<style>
 .category-picture {
   background-image: url("../public/img/categoryPic.png");
   background-position: center center;
@@ -116,7 +97,7 @@ watch(categories, () => {
 }
 
 .container-slide .card {
-  width: 160px;
+  width: 160px !important;
   height: 68px;
   padding: 18px 24px 18px 24px;
   display: flex;
