@@ -13,21 +13,31 @@
       <div class="collections-cards">
         <div class="card-text">
           <h2>{{ activeEvent.title || 'No title available' }}</h2>
-          <p>{{ activeEvent.description || 'No description available' }}</p>
+          <p class="description">{{ activeEvent.description || 'No description available' }}</p>
         </div>
-        <div class="swiper-containerM" style="overflow: hidden">
-          <div class="swiper-wrapper cards">
-            <div
-              class="swiper-slide card"
-              v-for="(event, index) in events[selectedCollection.id] || []"
+        <v-sheet style="background-color: transparent" max-width="50%">
+          <v-slide-group v-model="activeIndex" class="pa-2">
+            <v-slide-group-item
+              v-for="event in events[selectedCollection.id]"
               :key="event.id"
-              @click="updateActiveSlide(event)"
-              :class="{ active: isActiveSlide(index) }"
             >
-              <img :src="eventImage(event)" alt="" />
-            </div>
-          </div>
-        </div>
+              <v-card
+                style="border-radius: 50%; background-color: transparent"
+                class="ma-1 card"
+               
+                @click="() => updateActiveSlide(event)"
+              >
+                <v-img
+                  height="50"
+                  width="50"
+                  style="border-radius: 50%"
+                  cover
+                  :src="eventImage(event)"
+                ></v-img>
+              </v-card>
+            </v-slide-group-item>
+          </v-slide-group>
+        </v-sheet>
       </div>
     </div>
     <div class="scroll">
@@ -39,8 +49,6 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import Swiper from 'swiper';
-import 'swiper/swiper-bundle.css';
 import { useCollectionStore } from '@/stores/collections';
 
 const collectionStore = useCollectionStore();
@@ -124,18 +132,6 @@ watch(
 
 onMounted(async () => {
   await fetchCollections();
-  new Swiper('.swiper-containerM', {
-    slidesPerView: 'auto',
-    spaceBetween: 5,
-    centeredSlides: false,
-    loop: true,
-    fadeEffect: { crossFade: true },
-    effect: 'fade',
-    navigation: {
-      nextEl: '.next',
-      prevEl: '.prev',
-    },
-  });
 });
 </script>
 
@@ -350,5 +346,15 @@ onMounted(async () => {
 
 .scroll .scroll-icon i {
   color: #fff;
+}
+
+.description {
+  max-height: 4em; /* Three lines of text */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* Limit to three lines */
+  -webkit-box-orient: vertical;
+  margin-top: 20px;
 }
 </style>
