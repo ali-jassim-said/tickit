@@ -53,7 +53,7 @@
 export default {};
 </script>
 
-<style>
+<style scoped>
 .footerUp {
   width: 100%;
   position: relative;

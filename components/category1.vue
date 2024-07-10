@@ -134,7 +134,7 @@ const eventImage = (event) => {
 </script>
 
 
-<style>
+<style scoped>
 .section-category {
   direction: rtl;
   width: 100%;

@@ -112,7 +112,7 @@ watch(() => events.value, (newEvents) => {
 </script>
 
 
-<style>
+<style scoped>
 
 .no-events-message {
   padding: 20px;
