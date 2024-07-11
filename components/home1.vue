@@ -62,7 +62,7 @@
         </v-sheet>
       </div>
     </div>
-    <div class="scroll">
+    <div class="scroll" @click="scrollToSecondPage">
       <div class="scroll-text">عرض المزيد</div>
       <div class="scroll-icon"><i class="ri-arrow-down-double-fill"></i></div>
     </div>
@@ -144,6 +144,10 @@ const nextSlide = () => {
       events.value[selectedCollection.value.id][activeIndex.value]
     );
   }
+};
+
+const scrollToSecondPage = () => {
+  window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
 };
 
 watch(
@@ -404,6 +408,8 @@ onMounted(async () => {
   justify-content: center;
 }
 
+
+
 .scroll .scroll-text {
   font-size: 20px;
   font-weight: 700;
@@ -423,6 +429,36 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+.scroll .scroll-icon::after {
+  content: "";
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 50%;
+  border: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.scroll .scroll-icon::before {
+  content: "";
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 50%;
+  border: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .scroll .scroll-icon i {
