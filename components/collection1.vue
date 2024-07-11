@@ -227,6 +227,7 @@ color: #fff;
 .category-cards .card .card-text{
   width: 247px;
 height: 143px;
+direction: ltr;
 display: flex;
 flex-direction: column;
 gap: 12px;

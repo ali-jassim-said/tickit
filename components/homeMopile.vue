@@ -36,6 +36,7 @@
                   align-items: center;
                   justify-content: center;
                   box-sizing: border-box;
+                  transition: all .2s ease;
                 "
                 class="ma-1 card"
                 :class="{ active: isActiveSlide(index) }"

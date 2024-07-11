@@ -45,7 +45,7 @@
               >
                 <v-img
                   height="70%"
-                  style="margin: 10px; border-radius: 12px"
+                  style="margin: 10px; border-radius: 12px;"
                   cover
                   :src="eventImage(event)"
                 ></v-img>
