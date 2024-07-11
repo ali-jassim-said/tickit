@@ -37,7 +37,7 @@
               :key="event.id"
             >
               <v-card
-                style="border-radius: 12px; background-color: #fff"
+                style="border-radius: 12px; background-color: #fff; text-align: end;"
                 class="ma-4 card"
                 height="216"
                 width="177"

@@ -11,8 +11,10 @@
         width="100%"
         class="slide-middle"
       >
-        <v-slide-group v-model="activeIndex" class="pa-2" style="width: 100%">
+        <v-slide-group  next-icon="mdi-plus"
+        prev-icon="mdi-minus" v-model="activeIndex" class="pa-2" style="width: 100%">
           <v-slide-group-item
+         
             v-for="(item, index) in categories"
             :key="index"
             :class="{ 'active-slide': index === activeIndex }"

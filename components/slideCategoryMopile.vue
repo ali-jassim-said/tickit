@@ -2,31 +2,35 @@
   <div class="category-picture">
     <div class="head-category"><span>كلشي</span> موجود بمنصة واحد</div>
     <div class="swiper-containerM2" style="height: 116px; overflow: hidden;">
-      <div class="swiper-wrapper container-slide">
-        <div
-          class="swiper-slide card"
+      <v-slide-group v-model="activeIndex" class="container-slide">
+        <v-slide-group-item
           v-for="(category, index) in categories"
           :key="category.id"
-          :class="{ active: index === activeIndex }"
-          @click="updateActiveSlide(index)"
         >
-          <h3>{{ category.name }}</h3>
-          <i class="ri-calendar-2-line"></i>
-        </div>
-      </div>
+          <div 
+            class="swiper-slide card ma-4" 
+            :class="{ 'active': index === activeIndex }"
+            @click="updateActiveSlide(index)"
+          >
+            <h3>{{ category.name }}</h3>
+            <i class="ri-calendar-2-line"></i>
+          </div>
+        </v-slide-group-item>
+      </v-slide-group>
     </div>
   </div>
 </template>
 
+
+
+
 <script setup>
 import { ref, onMounted } from "vue";
-import Swiper from "swiper";
-import "swiper/swiper-bundle.css";
 import { useCategoriesStore } from "@/stores/categories";
 
 const categoriesStore = useCategoriesStore();
 const categories = ref([]);
-const activeIndex = ref(0);
+const activeIndex = ref(null);  // Initialize with null for no active card
 
 const fetchCategories = async () => {
   try {
@@ -37,28 +41,14 @@ const fetchCategories = async () => {
   }
 };
 
-const initSwiper = () => {
-  new Swiper(".swiper-containerM2", {
-    slidesPerView: 'auto',
-    spaceBetween: 10,
-    centeredSlides: false,
-    loop: true,
-    fadeEffect: { crossFade: true },
-    effect: "fade",
-  });
-};
-
 const updateActiveSlide = (index) => {
-  activeIndex.value = index;
+  activeIndex.value = activeIndex.value === index ? null : index;  // Toggle active index
 };
 
 onMounted(async () => {
   await fetchCategories();
-  initSwiper();
 });
 </script>
-
-
 
 
 
