@@ -30,7 +30,8 @@
           </p>
         </div>
         <v-sheet style="background-color: transparent" max-width="50%">
-          <v-slide-group v-model="activeIndex" class="pa-2">
+          <v-slide-group next-icon=""
+          prev-icon="" v-model="activeIndex" class="pa-2">
             <v-slide-group-item
               v-for="event in events[selectedCollection.id]"
               :key="event.id"

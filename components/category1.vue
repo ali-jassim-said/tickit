@@ -3,99 +3,60 @@
     <div class="container">
       <div class="category">
         <div class="header">
-          <div class="icons">
-            <i class="ri-arrow-right-s-line prev4"></i>
-            <i class="ri-arrow-left-s-line next4"></i>
-          </div>
           <div class="text">أكتشف جميع الاحداث</div>
         </div>
-        <div class="category-cards swiper-container4" style="overflow: hidden">
-          <div class="swiper-wrapper">
-            <div
-              v-for="(event, index) in eventsStore.events"
-              :key="index"
-              class="card swiper-slide"
-            >
-              <div class="card-img" :style="{ backgroundImage: 'url(' + eventImage(event) + ')' }">
-                <div class="date">
-                  <p class="number">
-                    {{ new Date(event.startDate).getDate() }}
-                  </p>
-                  <p class="text">
-                    {{
-                      new Date(event.startDate).toLocaleString("default", {
-                        month: "short",
-                      })
-                    }}
-                  </p>
+        <v-sheet style="background-color: transparent; direction: rtl;" width="100%" class="category-cards">
+          <v-slide-group v-model="eventsStore.events" class="pa-2" style="width: 100%;">
+            <v-slide-group-item v-for="(event, index) in eventsStore.events" :key="index" class="cards">
+              <v-card class="card ma-4">
+                <div class="card-img" :style="{ backgroundImage: 'url(' + eventImage(event) + ')' }">
+                  <div class="date">
+                    <p class="number">{{ new Date(event.startDate).getDate() }}</p>
+                    <p class="text">{{ new Date(event.startDate).toLocaleString("default", { month: "short" }) }}</p>
+                  </div>
+                  <i class="ri-calendar-2-line"></i>
                 </div>
-                <i class="ri-calendar-2-line"></i>
-              </div>
-              <div class="card-text">
-                <div class="card-date">
-                  <p>{{ event.title }}</p>
-                  <div class="date">
-                    <p>{{ new Date(event.startDate).toLocaleDateString() }}</p>
-                    <i class="ri-calendar-2-line"></i>
+                <div class="card-text">
+                  <div class="card-date">
+                    <p>{{ event.title }}</p>
+                    <div class="date">
+                      <p>{{ new Date(event.startDate).toLocaleDateString() }}</p>
+                      <i class="ri-calendar-2-line"></i>
+                    </div>
+                    <div class="date">
+                      <p>{{ event.ticketTypes.length ? event.ticketTypes[0].price : "N/A" }} د.ع</p>
+                      <i class="ri-calendar-2-line"></i>
+                    </div>
+                    <div class="date">
+                      <p>{{ event.ticketTypes.length ? event.ticketTypes[0].title : "No ticket types available" }}</p>
+                      <i class="ri-calendar-2-line"></i>
+                    </div>
                   </div>
-                  <div class="date">
-                    <p>
-                      {{
-                        event.ticketTypes.length
-                          ? event.ticketTypes[0].price
-                          : "N/A"
-                      }}
-                      د.ع
-                    </p>
-                    <i class="ri-calendar-2-line"></i>
-                  </div>
-                  <div class="date">
-                    <p>
-                      {{
-                        event.ticketTypes.length
-                          ? event.ticketTypes[0].title
-                          : "No ticket types available"
-                      }}
-                    </p>
-                    <i class="ri-calendar-2-line"></i>
-                  </div>
-                </div>
-                <div class="card-price">
-                  <button><span>حجز تذكرة</span></button>
-                  <div class="price">
-                    <p>يبدء سعر حجز التذاكر</p>
-                    <div class="iq">
-                      {{
-                        event.ticketTypes.length
-                          ? event.ticketTypes[0].price
-                          : "N/A"
-                      }}
-                      د.ع
+                  <div class="card-price">
+                    <button><span>حجز تذكرة</span></button>
+                    <div class="price">
+                      <p>يبدء سعر حجز التذاكر</p>
+                      <div class="iq">{{ event.ticketTypes.length ? event.ticketTypes[0].price : "N/A" }} د.ع</div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
+              </v-card>
+            </v-slide-group-item>
+          </v-slide-group>
+        </v-sheet>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
-import Swiper from "swiper";
-import { Navigation } from "swiper/modules";
-import "swiper/swiper-bundle.css";
+import { onMounted, ref } from "vue";
 import { useEventsStore } from "~/stores/events"; 
 
-// Swiper setup
-Swiper.use([Navigation]);
-
 const eventsStore = useEventsStore();
+const activeIndex = ref(0);
 
-// Function to fetch events and initialize Swiper
+// Function to fetch events
 onMounted(() => {
   eventsStore.fetchEvents(
     eventsStore.PageNumber,
@@ -103,24 +64,6 @@ onMounted(() => {
     eventsStore.categoryId,
     eventsStore.collectionId
   );
-
-  let swiper;
-
-  function initSwiper() {
-    swiper = new Swiper(".swiper-container4", {
-      navigation: {
-        nextEl: ".next4",
-        prevEl: ".prev4",
-      },
-      slidesPerView: "auto",
-      spaceBetween: 5,
-      loop: true,
-      centeredSlides: false,
-      fade: true,
-    });
-  }
-
-  initSwiper();
 });
 
 // Function to get the correct image URL for an event
@@ -131,6 +74,8 @@ const eventImage = (event) => {
   const image = event.images.find(image => image.eventImageType === 1);
   return image ? `https://${image.imageUrl}` : '/path/to/default-image.jpg'; // Replace with your default image path
 };
+
+
 </script>
 
 
@@ -155,7 +100,6 @@ const eventImage = (event) => {
 .category .header {
   height: 24px;
   display: flex;
-  flex-direction: row-reverse;
   justify-content: space-between;
 }
 

@@ -1,24 +1,29 @@
 <template>
   <div class="category-picture">
     <img class="pic2" src="../public/img/text1.png" alt="" />
-    <div class="middle swiper-container3">
+    <div class="middle">
       <div class="icons-category">
-        <i class="ri-arrow-right-s-line next3"></i>
-        <i class="ri-arrow-left-s-line prev3"></i>
+        <i class="ri-arrow-right-s-line" @click="nextSlide"></i>
+        <i class="ri-arrow-left-s-line" @click="prevSlide"></i>
       </div>
-      <div class="slide-middle">
-        <div class="swiper-wrapper">
-          <div
-            class="swiper-slide card-middle"
+      <v-sheet
+        style="background-color: transparent; direction: rtl"
+        width="100%"
+        class="slide-middle"
+      >
+        <v-slide-group v-model="activeIndex" class="pa-2" style="width: 100%">
+          <v-slide-group-item
             v-for="(item, index) in categories"
             :key="index"
             :class="{ 'active-slide': index === activeIndex }"
           >
-            <i>{{ item.order }}</i>
-            <p>{{ item.name }}</p>
-          </div>
-        </div>
-      </div>
+            <v-card class="card-middle ma-4">
+              <i>{{ item.order }}</i>
+              <p>{{ item.name }}</p>
+            </v-card>
+          </v-slide-group-item>
+        </v-slide-group>
+      </v-sheet>
     </div>
     <img src="../public/img/text2.png" alt="" />
   </div>
@@ -26,13 +31,7 @@
 
 <script setup>
 import { useCategoriesStore } from "@/stores/categories";
-import { onMounted, ref, watch } from "vue";
-import Swiper from "swiper";
-import { Navigation } from "swiper/modules";
-import "swiper/swiper-bundle.css";
-
-// Swiper setup
-Swiper.use([Navigation]);
+import { onMounted, ref } from "vue";
 
 const categoriesStore = useCategoriesStore();
 const categories = ref([]);
@@ -45,38 +44,21 @@ const fetchCategories = async () => {
   error.value = categoriesStore.error;
 };
 
-const initSwiper = () => {
-  const swiperContainer = document.querySelector(".swiper-container3 .slide-middle");
-  const swiperOptions = {
-    navigation: {
-      nextEl: ".next3",
-      prevEl: ".prev3",
-    },
-    slidesPerView: 'auto',
-    spaceBetween: 7,
-    loop: categories.value.length > 1, // Enable loop only if there are enough slides
-    centeredSlides: false,
-    fade: true,
-  };
-
-  
-
-  if (swiperContainer) {
-    new Swiper(swiperContainer, swiperOptions);
+const nextSlide = () => {
+  if (activeIndex.value < categories.value.length - 1) {
+    activeIndex.value++;
   }
+};
 
-  new Swiper(swiperContainer, swiperOptions);
+const prevSlide = () => {
+  if (activeIndex.value > 0) {
+    activeIndex.value -= 1;
+  }
+  console.log(activeIndex.value);
 };
 
 onMounted(async () => {
   await fetchCategories();
-  initSwiper();
-});
-
-watch(categories, () => {
-  if (categories.value.length > 0) {
-    initSwiper();
-  }
 });
 </script>
 
@@ -169,12 +151,12 @@ watch(categories, () => {
 
 .middle {
   overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.slide-middle{
+.slide-middle {
   overflow: hidden;
 }
 </style>

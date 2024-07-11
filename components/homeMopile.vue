@@ -258,6 +258,7 @@ onMounted(async () => {
 }
 
 .collections-cards .card-text {
+  height: 200px;
   justify-content: space-between;
 }
 
@@ -349,11 +350,11 @@ onMounted(async () => {
 }
 
 .description {
-  max-height: 4em; /* Three lines of text */
+  max-height: 7em; /* Three lines of text */
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 4; /* Limit to three lines */
+  -webkit-line-clamp: 7; /* Limit to three lines */
   -webkit-box-orient: vertical;
   margin-top: 20px;
 }
