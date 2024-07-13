@@ -8,6 +8,7 @@
         <v-sheet style="background-color: transparent; direction: rtl;" width="100%" class="category-cards">
           <v-slide-group class="pa-2" style="width: 100%;">
             <v-slide-group-item v-for="(event, index) in events[collection.id]" :key="index" class="cards">
+              <nuxt-link :to="`/${event.id}`">
               <v-card class="card ma-4">
                 <div class="card-img" :style="{ backgroundImage: `url(${eventImage(event)})` }">
                   <div class="date">
@@ -41,6 +42,7 @@
                   </div>
                 </div>
               </v-card>
+            </nuxt-link>
             </v-slide-group-item>
           </v-slide-group>
         </v-sheet>
