@@ -33,7 +33,6 @@ export const useEventsStore = defineStore("events", {
       try {
         const response = await getCustomerEventById(eventId);
         this.event = response.data;
-        console.log(this.event.name)
       } catch (error) {
         this.error = error.response ? error.response.data.message : error.message;
         console.log(this.error);
