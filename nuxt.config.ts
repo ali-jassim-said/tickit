@@ -42,7 +42,7 @@ export default defineNuxtConfig({
   ],
   css: [
     './assets/css/style.css',
-    'remixicon/fonts/remixicon.css'
+    'remixicon/fonts/remixicon.css',
   ],
   runtimeConfig: {
     public: {

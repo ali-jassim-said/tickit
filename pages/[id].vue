@@ -2,7 +2,15 @@
   <div class="details">
     <div class="details-flex">
       <div class="img1">
-        <div class="details-img2" :style="{ backgroundImage: `url(${eventImage(event)})` }">
+        <div
+          v-if="event && event.event"
+          class="details-img2"
+          :style="{ backgroundImage: `url(${eventImage(event)})` }"
+        ></div>
+        <div class="map" id="map" style="width: 100%; height: 245px"></div>
+        <div class="event-details">
+          <div class="one"></div>
+          <div class="two"></div>
         </div>
       </div>
       <div class="img2">
@@ -11,35 +19,43 @@
           <div v-else-if="error">{{ error }}</div>
           <div v-else>
             <div v-if="event && event.event" class="card">
-              <div class="card-img" :style="{ backgroundImage: `url(${eventImage(event)})` }">
+              <div
+                class="card-img"
+                :style="{ backgroundImage: `url(${eventImage(event)})` }"
+              >
                 <div class="date">
-                  <p class="number">{{ new Date(event.event.startDate).getDate() }}</p>
-                  <p class="text">{{ new Date(event.event.startDate).toLocaleString("default", { month: "short" }) }}</p>
+                  <p class="number">
+                    {{ new Date(event.event.startDate).getDate() }}
+                  </p>
+                  <p class="text">
+                    {{
+                      new Date(event.event.startDate).toLocaleString(
+                        "default",
+                        { month: "short" }
+                      )
+                    }}
+                  </p>
                 </div>
                 <i class="ri-calendar-2-line"></i>
               </div>
             </div>
           </div>
         </div>
-         <div class="card-text">
-        
-                <h1>{{ event.event.title }}</h1>
-                <p>{{ event.event.description }}</p>
-              </div>
-              <div class="text">
-                <div class="pay">
-                  <button>
-                    <img src="/img/Mobile app store badge.png" alt="" />
-                  </button>
-                  <button>
-                    <img src="/img/Mobile app store badge.png" alt="" />
-                  </button>
-                </div>
-              </div>
+        <div v-if="event && event.event" class="card-text">
+          <h1>{{ event.event.title }}</h1>
+          <p>{{ event.event.description }}</p>
+        </div>
+        <div class="text">
+          <div class="pay">
+            <button>
+              <img src="/img/Mobile app store badge.png" alt="" />
+            </button>
+            <button>
+              <img src="/img/Mobile app store badge.png" alt="" />
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="details-text">
-     
     </div>
     <div class="down">
       <div class="footer-down">
@@ -76,6 +92,29 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useEventsStore } from "~/stores/events";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+const map = ref(null);
+let leafletMap = null;
+
+onMounted(() => {
+  // Initialize the Leaflet map
+  leafletMap = L.map("map").setView([33.3152, 44.3661], 13);
+
+  // Add OpenStreetMap tile layer
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}", {
+    foo: "bar",
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(leafletMap);
+
+  // Example marker addition, modify or remove as needed
+  L.marker([33.3152, 44.3661]).addTo(leafletMap).bindPopup("A sample popup.");
+
+  // Store the map instance in the ref
+  map.value = leafletMap;
+});
 
 const route = useRoute();
 const { id } = route.params;
@@ -112,51 +151,70 @@ watch(
 
 // Helper function to get event image
 const eventImage = (event) => {
-  const image = event?.event?.images?.find((image) => image.eventImageType === 1);
+  const image = event?.event?.images?.find(
+    (image) => image.eventImageType === 1
+  );
   return image ? `https://${image.imageUrl}` : "default-image-url";
 };
 </script>
 
-
 <style scoped>
-
 .details {
-  height: 100vh;
+  position: relative;
+  min-height: 100vh;
   width: 100%;
 }
 
-
 .details-flex {
+  width: 90%;
+  margin: auto;
   display: flex;
   gap: 20px;
 }
 
-
-.img1{
-  width: 20%;
+.map {
+  border-radius: 24px;
 }
 
-.img2{
+.event-details {
+  width: 100%;
+  height: 253px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+}
+
+.event-details .one{
+  width: 100%;
+height: 55px;
+padding: 7px 0px 7px 24px;
+border-radius: 8px;
+display: flex;
+justify-content: space-between;
+}
+
+.img1 {
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.img2 {
   width: 80%;
 }
 
 .details-img2 {
-height: 116px;
-border-radius: 24px;
-}
-
-.details-img2{
-   background-position: center center;
+  height: 116px;
+  width: 100%;
+  border-radius: 24px;
+  background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
 }
-
-
-.details-text{
-
-}
-
 
 .category-cards {
   gap: 14px;
@@ -172,7 +230,6 @@ border-radius: 24px;
 .category-cards .card .card-img {
   width: 100%;
   height: 379px;
-  border-radius: 8px;
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -183,8 +240,6 @@ border-radius: 24px;
 .card .card-img .date {
   width: 78px;
   height: 78px;
-  border-radius: 8px 8px 0px 0px;
-  border: 0px 0px 2px 0px;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.5) 0%,
@@ -197,19 +252,19 @@ border-radius: 24px;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  border-radius: 8px 8px 0px 0px;
+  border: 0px 0px 2px 0px;
 }
 
 .card .card-img .date .number {
   font-size: 24px;
   font-weight: 700;
-  line-height: 28.8px;
   color: rgba(255, 255, 255, 1);
 }
 
 .card .card-img .date .text {
   font-size: 14px;
   font-weight: 400;
-  line-height: 16.8px;
   color: rgba(255, 255, 255, 1);
 }
 
@@ -221,17 +276,14 @@ border-radius: 24px;
   color: #fff;
 }
 
-.category-cards .card .card-text {
+.card-text {
   width: 100%;
-  height: 226px;
   margin-top: 20px;
   gap: 18px;
-  direction: rtl;
 }
 
-.category-cards .card .card-text h1 {
+.card-text h1 {
   width: 100%;
-  height: 48px;
   font-size: 48px;
   font-weight: 400;
   line-height: 48px;
@@ -239,9 +291,8 @@ border-radius: 24px;
   color: #1d2329;
 }
 
-.category-cards .card .card-text p {
-  width: 100%;
-  height: 160px;
+.card-text p {
+  min-height: 260px;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -249,75 +300,38 @@ border-radius: 24px;
   color: #1d2329;
 }
 
-.footerUp {
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.footerUp .img img {
-  width: 242.24px;
-}
-
-.footerUp .img {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-around;
-  height: 488px;
-}
-
-.footerUp .img .text {
-  width: 50%;
-}
-
-.footerUp .img .text h2 {
-  color: rgba(29, 35, 41, 1);
-  font-size: 48px;
-  font-weight: 400;
-  line-height: 48px;
-  text-align: right;
-}
-
-.footerUp .img .text p {
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 20px;
-  text-align: right;
-  color: rgba(29, 35, 41, 1);
-}
-
- .text .pay {
+.text .pay {
   display: flex;
   align-items: center;
   justify-content: end;
   gap: 10px;
 }
 
-text .pay button img {
+.text .pay button img {
   width: 120px;
   height: 40px;
   border-radius: 7px;
-  border: 1px;
   border: 1px solid rgba(166, 166, 166, 1);
   margin-top: 10px;
 }
 
-
-.down{
-  height: 20%;
+.down {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
 }
 
 .footer-down {
   width: 100%;
   height: 100%;
-  padding: 24px 0px 0px 0px;
+  padding: 24px 0 0 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
   background: rgba(20, 20, 23, 1);
 }
 
 .footer-down .one {
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -327,7 +341,7 @@ text .pay button img {
   display: flex;
   gap: 24px;
   color: #fff;
-  margin-top: 10px;
+  margin: 10px;
 }
 
 .footer-down .one .text div {
@@ -347,8 +361,7 @@ text .pay button img {
 
 .footer-down .two {
   width: 100%;
-  height: 56px;
-  padding: 12px 78px 12px 78px;
+  padding: 12px 78px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -377,7 +390,7 @@ text .pay button img {
   .footer-down .two {
     height: 100%;
     flex-direction: column-reverse;
-    padding: 12px 60px 12px 60px;
+    padding: 12px 60px;
   }
 
   .footer-down .two .text {
@@ -393,29 +406,6 @@ text .pay button img {
   .footer-down .one .text div:nth-child(3),
   .footer-down .one .text div:nth-child(4) {
     display: none;
-  }
-
-  .footerUp .img {
-    flex-direction: column-reverse;
-    height: 100%;
-  }
-
-  .footerUp .img .text {
-    width: 100%;
-  }
-
-  .container {
-    padding: 30px 10px;
-  }
-
-  .footerUp .img img {
-    margin-bottom: 4%;
-    height: 524px;
-    width: 335px;
-  }
-
-  .footerUp .img .text h2 {
-    margin-bottom: 15px;
   }
 }
 </style>
